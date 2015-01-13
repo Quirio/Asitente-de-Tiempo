@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>Menú 1</title>
+    <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script type="text/javascript">
+    function toCelsius(kelvin){
+      return (kelvin - 272.15).toFixed(2);
+    }
+
+    function unixToDate(unix){
+      return new Date(unix * 1000);
+    }
+
+    function convertirCoordenadas(latitud, longitud){
+      var posicion = new Object();
+
+      var latitudInicial = latitud;
+      var longitudInicial = longitud;
+
+      var anguloLatitud = Math.floor(latitudInicial);
+      var anguloLongitud = Math.floor(longitudInicial);
+
+      var resultadoLatitud = (latitudInicial - anguloLatitud)* 60;
+      var resultadoLongitud = (longitudInicial - anguloLongitud)* 60;
+
+      var minutoLatitud = Math.floor(resultadoLatitud);
+      var minutoLongitud = Math.floor(resultadoLongitud);
+
+      var segundosLatitud = (resultadoLatitud - minutoLatitud)* 60;
+      var segundosLongitud = (resultadoLongitud - minutoLongitud)* 60;
+
+      segundosLatitud = segundosLatitud.toFixed(5);
+      segundosLongitud = segundosLongitud.toFixed(5);
+
+      posicion['anguloLatitud'] = Math.abs(anguloLatitud);
+      posicion['anguloLongitud'] = Math.abs(anguloLongitud);
+
+      posicion['minutosLatitud'] = Math.abs(minutoLatitud);
+      posicion['minutosLongitud'] = Math.abs(minutoLongitud);
+
+      posicion['segundosLatitud'] = Math.abs(segundosLatitud);
+      posicion['segundosLongitud'] = Math.abs(segundosLongitud);
+
+      posicion['orientacionLatitud'] = (latitud >= 0)?("N"):("S");
+      posicion['orientacionLongitud'] = (longitud >= 0)?("E"):("W");
+
+      return posicion;
+    }
+        var onSuccess = function(position) {
+
+          var latitud = position.coords.latitude;
+          var longitud = position.coords.longitude;
+          var posicion = convertirCoordenadas(latitud,longitud);
+
+          var ajax_call = $.ajax({
+            url: 'http://api.openweathermap.org/data/2.5/weather?lat=' + latitud + '&lon=' + longitud + '&lang=es',
+            data: '',
+            type: 'GET',
+            success: function(resp){
+              $("#localizacion").html( '<img src="img/Weather/' + resp.weather[0].icon + '.png">' +
+                                       '<button type="submit" style="background-color:rgba(255,255,255,0.0); border:none;" id="localizar" onclick="obtenerGeolocalizacion()"><img src="img/reload1.png" /></button><br>' +
+                                       'Latitud: ' + posicion.anguloLatitud + 'º ' + 
+                                                     posicion.minutosLatitud + '\' ' + 
+                                                     posicion.segundosLatitud + '" ' + 
+                                                     posicion.orientacionLatitud +  '<br>' +
+                                       'Longitud: ' + posicion.anguloLongitud + 'º ' + 
+                                                      posicion.minutosLongitud + '\' ' + 
+                                                      posicion.segundosLongitud + '" ' + 
+                                                      posicion.orientacionLongitud + '<br>' +
+                                       'Ciudad: ' + resp.name + '<br>' +
+                                       'Descripción: ' + resp.weather[0].description + '<br>' +
+                                       'Temperatura: ' + toCelsius(resp.main.temp) + ' ºC<br>' +
+                                       'T. Máxima: ' + toCelsius(resp.main.temp_max) + ' ºC<br>' + 
+                                       'T. Mínima: ' + toCelsius(resp.main.temp_min) + ' ºC<br>' + 
+                                       'Humedad: ' + resp.main.humidity + '<br>' +
+                                       'Amanecer: ' + unixToDate(resp.sys.sunrise).toString() + '<br>' +
+                                       'Ocaso: ' + unixToDate(resp.sys.sunset).toString() + '<br>');
+
+            },
+            error: function(e) {console.error(e);}
+          });
+
+          
+
+    };
+
+        function onError(error) {
+            $('#localizacion').html('<img src="img/error1.png">' +
+                                       '<button type="submit" style="background-color:rgba(255,255,255,0.0); border:none;" id="localizar" onclick="obtenerGeolocalizacion()"><img src="img/reload1.png" /></button><br>');
+        }
+
+        var date;
+        var time, nTime;
+        var rastrear = false;
+        function obtenerGeolocalizacion() {
+          $("#localizacion").html('<img src="img/loading1.gif">');
+            rastrear = true;
+            if(rastrear == true){
+                navigator.geolocation.getCurrentPosition(onSuccess, onError);
+                //esperar();
+            }
+
+        }
+
+        /*
+        function esperar(){
+            date = new Date();
+            time = date.getTime();
+            nTime = time + 2000;
+            while(time < nTime) {
+                date = new Date();
+                time = date.getTime();
+            }
+        }
+
+        function detenerGeolocalizacion(){
+            rastrear = false;
+            document.getElementById("detenerLocalizacion").style = "display: none;";
+            document.getElementById("localizar").style = "display: inline";
+        }
+        */
+
+        window.onload = function() {
+          obtenerGeolocalizacion();
+        };
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="css/index.css"></link>
+</head>
+<body>
+    <center>
+        <br> 
+        <div id="localizacion"><img src="img/loading1.gif"></div>
+    </center>
+</body>
