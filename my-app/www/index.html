@@ -61,22 +61,23 @@
             success: function(resp){
               $("#localizacion").html( '<img src="img/Weather/' + resp.weather[0].icon + '.png">' +
                                        '<button type="submit" style="background-color:rgba(255,255,255,0.0); border:none;" id="localizar" onclick="obtenerGeolocalizacion()"><img src="img/reload1.png" /></button><br>' +
-                                       'Latitud: ' + posicion.anguloLatitud + 'º ' + 
+                                       '<div id="texto">' +
+                                       '<label>Latitud:</label> ' + posicion.anguloLatitud + 'º ' + 
                                                      posicion.minutosLatitud + '\' ' + 
                                                      posicion.segundosLatitud + '" ' + 
                                                      posicion.orientacionLatitud +  '<br>' +
-                                       'Longitud: ' + posicion.anguloLongitud + 'º ' + 
+                                       '<label>Longitud:</label> ' + posicion.anguloLongitud + 'º ' + 
                                                       posicion.minutosLongitud + '\' ' + 
                                                       posicion.segundosLongitud + '" ' + 
                                                       posicion.orientacionLongitud + '<br>' +
-                                       'Ciudad: ' + resp.name + '<br>' +
-                                       'Descripción: ' + resp.weather[0].description + '<br>' +
-                                       'Temperatura: ' + toCelsius(resp.main.temp) + ' ºC<br>' +
-                                       'T. Máxima: ' + toCelsius(resp.main.temp_max) + ' ºC<br>' + 
-                                       'T. Mínima: ' + toCelsius(resp.main.temp_min) + ' ºC<br>' + 
-                                       'Humedad: ' + resp.main.humidity + '<br>' +
-                                       'Amanecer: ' + unixToDate(resp.sys.sunrise).toString() + '<br>' +
-                                       'Ocaso: ' + unixToDate(resp.sys.sunset).toString() + '<br>');
+                                       '<label>Ciudad:</label> ' + resp.name + '<br>' +
+                                       '<label>Descripción:</label> ' + resp.weather[0].description[0].toUpperCase() + resp.weather[0].description.substr(1) + '<br>' +
+                                       '<label>Temperatura:</label> ' + toCelsius(resp.main.temp) + ' ºC<br>' +
+                                       '<label>T. Máxima:</label> ' + toCelsius(resp.main.temp_max) + ' ºC<br>' + 
+                                       '<label>T. Mínima:</label> ' + toCelsius(resp.main.temp_min) + ' ºC<br>' + 
+                                       '<label>Humedad:</label> ' + resp.main.humidity + '%<br>' +
+                                       '<label>Amanecer:</label> ' + unixToDate(resp.sys.sunrise).getHours() + ':' + unixToDate(resp.sys.sunrise).getMinutes() + '<br>' +
+                                       '<label>Ocaso:</label> ' + unixToDate(resp.sys.sunset).getHours() + ':' + unixToDate(resp.sys.sunset).getMinutes() + '<br></div>');
 
             },
             error: function(e) {console.error(e);}
@@ -123,6 +124,15 @@
         */
 
         window.onload = function() {
+          // console.log('Inicio');
+          var ahora = new Date();
+          var hora = ahora.getHours();
+          if ((hora >=0 && hora <= 6) || (hora >= 18)) {
+            $('#paginaCompleta').css('background-image','url("../img/night.jpg")');
+          }
+          else {
+            $('#paginaCompleta').css('background-image','url("../img/background.jpg")');
+          }
           obtenerGeolocalizacion();
         };
 
@@ -130,8 +140,10 @@
     <link rel="stylesheet" type="text/css" href="css/index.css"></link>
 </head>
 <body>
+    <div id="paginaCompleta">
     <center>
         <br> 
         <div id="localizacion"><img src="img/loading1.gif"></div>
     </center>
+  </div>
 </body>
