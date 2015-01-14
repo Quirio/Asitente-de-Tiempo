@@ -59,6 +59,11 @@
             data: '',
             type: 'GET',
             success: function(resp){
+              var ahora = new Date();
+              var hora = ahora.getHours() < 10 ? '0'+ahora.getHours() : ahora.getHours();
+              var minutos = ahora.getMinutes() < 10 ? '0'+ahora.getMinutes() : ahora.getMinutes();
+              var segundos = ahora.getSeconds() < 10 ? '0'+ahora.getSeconds() : ahora.getSeconds();
+              $("#ultima").html('<label>Última actualización:</label> ' + hora + ':' + minutos + ':' + segundos + ' h');
               $("#localizacion").html( '<img src="img/Weather/' + resp.weather[0].icon + '.png">' +
                                        '<button type="submit" style="background-color:rgba(255,255,255,0.0); border:none;" id="localizar" onclick="obtenerGeolocalizacion()"><img src="img/reload1.png" /></button><br>' +
                                        '<div id="texto">' +
@@ -128,10 +133,10 @@
           var ahora = new Date();
           var hora = ahora.getHours();
           if ((hora >=0 && hora <= 6) || (hora >= 18)) {
-            $('#paginaCompleta').css('background-image','url("../img/night.jpg")');
+            $('#paginaCompleta').css('background-image','url("img/night.jpg")');
           }
           else {
-            $('#paginaCompleta').css('background-image','url("../img/background.jpg")');
+            $('#paginaCompleta').css('background-image','url("img/background.jpg")');
           }
           obtenerGeolocalizacion();
         };
@@ -142,6 +147,7 @@
 <body>
     <div id="paginaCompleta">
     <center>
+        <div id="ultima"></div>
         <br> 
         <div id="localizacion"><img src="img/loading1.gif"></div>
     </center>
